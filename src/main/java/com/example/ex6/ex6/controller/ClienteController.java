@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("cliente")
+@RequestMapping("/clientes")
 public class ClienteController {
     private ClienteService clienteService;
 
@@ -21,7 +21,7 @@ public class ClienteController {
         clienteService.salvar(cliente);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
         clienteService.excluir(id);
     }
@@ -31,10 +31,13 @@ public class ClienteController {
         return clienteService.buscarTodos();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Cliente buscarPorId(@PathVariable Long id){
         return clienteService.findById(id);
     }
 
-
+    @PutMapping("/{id}")
+    public Cliente atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+        return clienteService.atualizar(id, cliente);
+    }
 }

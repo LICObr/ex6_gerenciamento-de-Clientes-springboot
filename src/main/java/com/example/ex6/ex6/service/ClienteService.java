@@ -28,4 +28,9 @@ public class ClienteService {
     public List<Cliente> buscarTodos() {
         return clienteRepository.findAll();
     }
+
+    public Cliente atualizar(Long id, Cliente cliente) {
+        cliente.setId(id);
+        return clienteRepository.save(cliente);
+    }
 }
