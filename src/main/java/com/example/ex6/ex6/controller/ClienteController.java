@@ -2,42 +2,53 @@ package com.example.ex6.ex6.controller;
 
 import com.example.ex6.ex6.entity.Cliente;
 import com.example.ex6.ex6.service.ClienteService;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
-    private ClienteService clienteService;
+    @Autowired
+    private final ClienteService clienteService;
 
     public ClienteController(ClienteService clienteService) {
         this.clienteService = clienteService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<Cliente>> findAll() {
+        List<Cliente> request = clienteService.findAll();
+        return ResponseEntity.ok(request);
+    }
+
     @PostMapping
-    public void save(@RequestBody Cliente cliente) {
-        clienteService.salvar(cliente);
+    public ResponseEntity<Cliente> save(@RequestBody Cliente cliente) {
+        Cliente save = clienteService.save(cliente);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                .path("/{id}").buildAndExpand(cliente.getId()).toUri();
+        return ResponseEntity.created(uri).body(save);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        clienteService.excluir(id);
-    }
-
-    @GetMapping
-    public List<Cliente> buscarTodos() {
-        return clienteService.buscarTodos();
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        clienteService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public Cliente buscarPorId(@PathVariable Long id){
-        return clienteService.findById(id);
+    public ResponseEntity<Cliente> findById(@PathVariable Long id) {
+        return clienteService.buscar(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public Cliente atualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
-        return clienteService.atualizar(id, cliente);
+    public ResponseEntity<Cliente> update(@PathVariable Long id, @RequestBody Cliente cliente) {
+        return ResponseEntity.ok(clienteService.update(id, cliente));
     }
 }
